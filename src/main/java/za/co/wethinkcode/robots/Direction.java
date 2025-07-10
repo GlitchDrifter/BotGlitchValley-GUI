@@ -5,5 +5,5 @@ package za.co.wethinkcode.robots;
  * It is used to indicate the direction in which a robot is facing or moving.
  */
 public enum Direction {
-    NORTH,SOUTH,WEST,EAST
+  NORTH, SOUTH, WEST, EAST
 }
