@@ -106,10 +106,13 @@ public class Maze {
    * @return true if the string can be parsed as an integer, false otherwise.
    */
   private boolean isInt(String n) {
+    if (n == null) {
+      return false;
+    }
     try {
-      int num = Integer.parseInt(n);
+      Integer.parseInt(n);
       return true;
-    } catch (Exception e) {
+    } catch (NumberFormatException e) {
       return false;
     }
   }
