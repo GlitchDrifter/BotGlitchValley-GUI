@@ -48,7 +48,7 @@ public class Robot {
    * @param name The name of the robot.
    * @param type The type of the robot.
    */
-  public Robot(String name, String type) {
+  public Robot(final String name, String type) {
     super();
     this.position = new Position(0, 0);
     this.name = name;
@@ -135,7 +135,7 @@ public class Robot {
    *
    * @param turnRight True if the robot turns right, false if it turns left.
    */
-  public void updateDirection(boolean turnRight) {
+  public void updateDirection(final boolean turnRight) {
     this.currentDirection = switch (getCurrentDirection()) {
       case NORTH -> turnRight ? EAST : WEST;
       case EAST -> turnRight ? SOUTH : NORTH;
@@ -171,7 +171,7 @@ public class Robot {
    * 
    * @param status The new operational status of the robot.
    */
-  public void setStatus(OperationalStatus status) {
+  public void setStatus(final OperationalStatus status) {
     this.status = status;
 
   }
@@ -190,7 +190,7 @@ public class Robot {
    * 
    * @param pos The new position of the robot.
    */
-  public void setPosition(Position pos) {
+  public void setPosition(final Position pos) {
     this.position = pos;
   }
 
@@ -200,7 +200,7 @@ public class Robot {
    * @param targetRobot Another robot instance.
    * @return Boolean whether robot was hit.
    */
-  public boolean hit(Robot targetRobot) {
+  public boolean hit(final Robot targetRobot) {
     boolean result;
     if (shots <= 0)
       return false;
@@ -214,47 +214,13 @@ public class Robot {
   }
 
   /**
-   * updates state robot was hit.
-   */
-  private boolean gotHit(Direction direction, Robot bullet) {
-    System.out.println(bullet.bulletDistance);
-    boolean isHit = switch (direction) {
-      case NORTH -> (this.position.getY() < bullet.position.getY())
-          && (this.position.getY() >= bullet.position.getY() - bullet.bulletDistance)
-          && this.position.getX() == bullet.position.getX();
-      case SOUTH -> (this.position.getY() > bullet.position.getY())
-          && (this.position.getY() <= bullet.position.getY() + bullet.bulletDistance)
-          && this.position.getX() == bullet.position.getX();
-      case EAST -> (this.position.getX() > bullet.position.getX())
-          && (this.position.getX() <= bullet.position.getX() + bullet.bulletDistance)
-          && this.position.getY() == bullet.position.getY();
-      case WEST -> (this.position.getX() < bullet.position.getX())
-          && (this.position.getX() >= bullet.position.getX() - bullet.bulletDistance)
-          && this.position.getY() == bullet.position.getY();
-    };
-    if (isHit) {
-      if (this.shield <= 0) {
-        this.status = DEAD;
-
-        Server handler = MultiServers.clientHandlerMap.get(this.name);
-        if (handler != null) {
-          handler.sendQuit();
-        }
-
-      } else
-        shield--;
-    }
-    return isHit;
-  }
-
-  /**
    * Gets the robot's state as a JSON object.
    * 
    * @return A JSON object representing the robot's state.
    */
   public JsonObject state() {
-    JsonObject state = new JsonObject();
-    JsonArray position = new JsonArray();
+    final JsonObject state = new JsonObject();
+    final JsonArray position = new JsonArray();
     position.add(this.position.getX());
     position.add(this.position.getY());
     state.add("position", position);
@@ -277,14 +243,14 @@ public class Robot {
   public boolean reload() {
     try {
       setStatus(RELOAD);
-      Server handler = MultiServers.clientHandlerMap.get(this.name);
+      final Server handler = MultiServers.clientHandlerMap.get(this.name);
       if (handler != null) {
         handler.sendReloadMessage();
       }
       shots = maxShots;
       Thread.sleep(REPAIR_DURATION * 1000L);
       setStatus(NORMAL);
-    } catch (InterruptedException e) {
+    } catch (final InterruptedException e) {
       throw new RuntimeException(e);
     }
     return true;
@@ -300,14 +266,14 @@ public class Robot {
   public boolean repair() {
     try {
       setStatus(REPAIR);
-      Server handler = MultiServers.clientHandlerMap.get(this.name);
+      final Server handler = MultiServers.clientHandlerMap.get(this.name);
       if (handler != null) {
         handler.sendRepairMessage();
       }
       shield = maxShields;
       Thread.sleep(REPAIR_DURATION * 1000L);
       setStatus(NORMAL);
-    } catch (InterruptedException e) {
+    } catch (final InterruptedException e) {
       throw new RuntimeException(e);
     }
     return true;
@@ -318,18 +284,18 @@ public class Robot {
    * 
    * @param name The new name of the robot.
    */
-  public void setName(String name) {
+  public void setName(final String name) {
     this.name = name;
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(final Object obj) {
     if (this == obj)
       return true;
     if (obj == null || getClass() != obj.getClass())
       return false;
 
-    Robot other = (Robot) obj;
+    final Robot other = (Robot) obj;
     return Objects.equals(this.name, other.getName());
   }
 
@@ -341,6 +307,40 @@ public class Robot {
   @Override
   public int hashCode() {
     return Objects.hash(name);
+  }
+
+  /**
+   * updates state robot was hit.
+   */
+  private boolean gotHit(final Direction direction, final Robot bullet) {
+    System.out.println(bullet.bulletDistance);
+    final boolean isHit = switch (direction) {
+      case NORTH -> (this.position.getY() < bullet.position.getY())
+          && (this.position.getY() >= bullet.position.getY() - bullet.bulletDistance)
+          && this.position.getX() == bullet.position.getX();
+      case SOUTH -> (this.position.getY() > bullet.position.getY())
+          && (this.position.getY() <= bullet.position.getY() + bullet.bulletDistance)
+          && this.position.getX() == bullet.position.getX();
+      case EAST -> (this.position.getX() > bullet.position.getX())
+          && (this.position.getX() <= bullet.position.getX() + bullet.bulletDistance)
+          && this.position.getY() == bullet.position.getY();
+      case WEST -> (this.position.getX() < bullet.position.getX())
+          && (this.position.getX() >= bullet.position.getX() - bullet.bulletDistance)
+          && this.position.getY() == bullet.position.getY();
+    };
+    if (isHit) {
+      if (this.shield <= 0) {
+        this.status = DEAD;
+
+        final Server handler = MultiServers.clientHandlerMap.get(this.name);
+        if (handler != null) {
+          handler.sendQuit();
+        }
+
+      } else
+        shield--;
+    }
+    return isHit;
   }
 
 }

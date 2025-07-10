@@ -15,25 +15,25 @@ public class TurnCommand extends Command {
   private static TurnCommand instance;
 
   /**
-   * Private constructor to create a Turn command with a direction argument.
-   *
-   * @param argument the direction to turn ("left" or "right")
-   */
-  private TurnCommand(String argument) {
-    super("turn", argument);
-  }
-
-  /**
    * Gets a TurnCommand instance with the given direction.
    * 
    * @param direction the direction to turn ("left" or "right")
    * @return A TurnCommand instance configured for the specified direction
    */
-  public static synchronized TurnCommand getInstance(String direction) {
+  public static synchronized TurnCommand getInstance(final String direction) {
     if (instance == null)
       instance = new TurnCommand(direction);
     instance.setArgument(direction);
     return instance;
+  }
+
+  /**
+   * Private constructor to create a Turn command with a direction argument.
+   *
+   * @param argument the direction to turn ("left" or "right")
+   */
+  private TurnCommand(final String argument) {
+    super("turn", argument);
   }
 
   /**
@@ -44,9 +44,9 @@ public class TurnCommand extends Command {
    * @return a JsonObject containing the result of the command execution
    */
   @Override
-  public JsonObject execute(World world) {
-    JsonObject response = new JsonObject();
-    JsonObject data = new JsonObject();
+  public JsonObject execute(final World world) {
+    final JsonObject response = new JsonObject();
+    final JsonObject data = new JsonObject();
     boolean turn;
 
     if (getArgument().equals("\"right\"")) {

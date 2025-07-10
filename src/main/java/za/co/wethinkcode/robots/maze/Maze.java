@@ -25,24 +25,24 @@ public class Maze {
     Config.loadConfig("config.properties");
     mode = mode.isEmpty() ? Config.OBSTACLE_MODE : mode;
     if (mode.equals("Random")) {
-      Random r = new Random();
+      final Random r = new Random();
       randomize(r.nextInt(2, 6));
 
     } else if (isInt(mode)) {
       randomize(Integer.parseInt(mode));
     } else if (mode.contains(",")) {
       try {
-        String[] obs = mode.split(" ");
+        final String[] obs = mode.split(" ");
         String[] parts;
-        for (String o : obs) {
+        for (final String o : obs) {
 
-          String oType = o.split("-")[0];
+          final String oType = o.split("-")[0];
           parts = o.split("-")[1].split(":");
-          int topLeftX = Integer.parseInt(parts[0].split(",")[0]);
-          int topLeftY = Integer.parseInt(parts[0].split(",")[1]);
-          int bottomRightX = Integer.parseInt(parts[1].split(",")[0]);
-          int bottomRightY = Integer.parseInt(parts[1].split(",")[1]);
-          ObstacleType type = switch (oType) {
+          final int topLeftX = Integer.parseInt(parts[0].split(",")[0]);
+          final int topLeftY = Integer.parseInt(parts[0].split(",")[1]);
+          final int bottomRightX = Integer.parseInt(parts[1].split(",")[0]);
+          final int bottomRightY = Integer.parseInt(parts[1].split(",")[1]);
+          final ObstacleType type = switch (oType) {
             case "BP" -> ObstacleType.BOTTOMLESS_PIT;
             case "M" -> ObstacleType.MOUNTAIN;
             case "L" -> ObstacleType.LAKE;
@@ -52,7 +52,7 @@ public class Maze {
           obstacleList.add(new Obstacle(topLeftX, topLeftY, bottomRightX, bottomRightY, type));
 
         }
-      } catch (Exception e) {
+      } catch (final Exception e) {
         System.out.println("Cannot get Obstacles from Config " + e.getMessage());
         obstacleList = new ArrayList<>();
       }
@@ -72,21 +72,21 @@ public class Maze {
    * @param n The number of random obstacles to be generated.
    *          adds "n" random types of obstacles in the maze
    */
-  private void randomize(int n) {
+  private void randomize(final int n) {
     Config.loadConfig("config.properties");
-    Random r = new Random();
+    final Random r = new Random();
     Obstacle newObstacle;
     for (int i = 0; i < n; i++) {
 
       while (true) {
-        int topLeftX = r.nextInt(1, Config.WIDTH - 1);
-        int topLeftY = r.nextInt(1, Config.WIDTH - 1);
-        ObstacleType type = ObstacleType.values()[r.nextInt(0, 3)];
-        int size = r.nextInt(2, 10);
+        final int topLeftX = r.nextInt(1, Config.WIDTH - 1);
+        final int topLeftY = r.nextInt(1, Config.WIDTH - 1);
+        final ObstacleType type = ObstacleType.values()[r.nextInt(0, 3)];
+        final int size = r.nextInt(2, 10);
 
         newObstacle = new Obstacle(topLeftX, topLeftY, size, type);
         boolean canAdd = true;
-        for (Obstacle o : obstacleList) {
+        for (final Obstacle o : obstacleList) {
           if (o.isOverlapping(newObstacle)) {
             canAdd = false;
           }
@@ -105,14 +105,14 @@ public class Maze {
    * @param n The string to check.
    * @return true if the string can be parsed as an integer, false otherwise.
    */
-  private boolean isInt(String n) {
+  private boolean isInt(final String n) {
     if (n == null) {
       return false;
     }
     try {
       Integer.parseInt(n);
       return true;
-    } catch (NumberFormatException e) {
+    } catch (final NumberFormatException e) {
       return false;
     }
   }

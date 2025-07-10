@@ -19,14 +19,6 @@ public class DumpCommand extends Command {
   private static DumpCommand instance;
 
   /**
-   * Private constructor for DumpCommand.
-   * Sets the command name to "dump".
-   */
-  private DumpCommand() {
-    super("dump");
-  }
-
-  /**
    * Gets the singleton instance of DumpCommand.
    *
    * @return The singleton instance of DumpCommand
@@ -39,11 +31,19 @@ public class DumpCommand extends Command {
   }
 
   /**
+   * Private constructor for DumpCommand.
+   * Sets the command name to "dump".
+   */
+  private DumpCommand() {
+    super("dump");
+  }
+
+  /**
    * Prints the current state of the obstacles in the world.
    *
    * @param obstacleList the list of obstacles to be printed
    */
-  public void listObstacles(List<Obstacle> obstacleList) {
+  public void listObstacles(final List<Obstacle> obstacleList) {
     System.out.println("Obstacles currently in world:");
     for (int i = 0; i < obstacleList.size(); i++) {
       System.out.println("Obstacle " + (i + 1) + ": " + obstacleList.get(i));
@@ -51,7 +51,7 @@ public class DumpCommand extends Command {
   }
 
   @Override
-  public JsonObject execute(World world) {
+  public JsonObject execute(final World world) {
     return new JsonObject();
   }
 
@@ -60,15 +60,15 @@ public class DumpCommand extends Command {
    *
    * @param world the world to be dumped
    */
-  public void dump(World world) {
+  public void dump(final World world) {
     System.out.println("Dumping world...");
-    StringBuilder names = new StringBuilder("[");
+    final StringBuilder names = new StringBuilder("[");
     if (!world.getBots().isEmpty()) {
       names.deleteCharAt(names.length() - 1);
     }
     new RobotsCommand().printRobots(world);
     listObstacles(world.getObstacles());
-    AsciiWorld txtWorld = new AsciiWorld(world);
+    final AsciiWorld txtWorld = new AsciiWorld(world);
     txtWorld.printToTxt();
     System.out.println(txtWorld.getContent().toString());
   }

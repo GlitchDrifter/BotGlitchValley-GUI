@@ -1,15 +1,5 @@
 package za.co.wethinkcode.robots;
 
-import za.co.wethinkcode.robots.config.Config;
-import za.co.wethinkcode.robots.obstacle.Obstacle;
-import za.co.wethinkcode.robots.obstacle.ObstacleType;
-import za.co.wethinkcode.robots.robot.Robot;
-
-import java.util.List;
-
-import static za.co.wethinkcode.robots.UpdateResponse.*;
-import static za.co.wethinkcode.robots.UpdateResponse.FAILURE_OBSTRUCTED;
-
 /**
  * The Position class represents a position in a 2D space.
  * It contains x and y coordinates and provides methods to access them.
@@ -24,7 +14,7 @@ public class Position {
    * @param x the x coordinate
    * @param y the y coordinate
    */
-  public Position(int x, int y) {
+  public Position(final int x, final int y) {
     this.x = x;
     this.y = y;
   }
@@ -44,13 +34,13 @@ public class Position {
    * @return true if the positions are equal, false otherwise
    */
   @Override
-  public boolean equals(Object o) {
+  public boolean equals(final Object o) {
     if (this == o)
       return true;
     if (o == null || getClass() != o.getClass())
       return false;
 
-    Position position = (Position) o;
+    final Position position = (Position) o;
 
     if (x != position.x)
       return false;
@@ -74,11 +64,11 @@ public class Position {
    * @param bottomRight the bottom-right corner of the rectangle
    * @return true if the position is within the rectangle, false otherwise
    */
-  public boolean isIn(Position topLeft, Position bottomRight) {
-    boolean withinTop = y >= topLeft.getY();
-    boolean withinBottom = y <= bottomRight.getY();
-    boolean withinLeft = x >= topLeft.getX();
-    boolean withinRight = x <= bottomRight.getX();
+  public boolean isIn(final Position topLeft, final Position bottomRight) {
+    final boolean withinTop = y >= topLeft.getY();
+    final boolean withinBottom = y <= bottomRight.getY();
+    final boolean withinLeft = x >= topLeft.getX();
+    final boolean withinRight = x <= bottomRight.getX();
     return withinTop && withinBottom && withinLeft && withinRight;
   }
 
@@ -89,7 +79,7 @@ public class Position {
    * @param direction       direction of anotherPosition from this position.
    * @return The distance between this position and anotherPosition.
    */
-  public int distanceFrom(Position anotherPosition, Direction direction) {
+  public int distanceFrom(final Position anotherPosition, final Direction direction) {
     return switch (direction) {
       case NORTH, SOUTH -> Math.abs(y - anotherPosition.getY());
       case EAST, WEST -> Math.abs((x - anotherPosition.getX()));
@@ -104,7 +94,7 @@ public class Position {
    * @param nrSteps The number of steps to move.
    * @return The new position after moving.
    */
-  public Position newPos(Direction direction, int nrSteps) {
+  public Position newPos(final Direction direction, final int nrSteps) {
     int newX = x;
     int newY = y;
     switch (direction) {

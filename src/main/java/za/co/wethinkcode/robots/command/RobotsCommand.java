@@ -17,14 +17,6 @@ public class RobotsCommand extends Command {
   private static RobotsCommand instance;
 
   /**
-   * Private constructor for RobotsCommand.
-   * Sets the command name to "robots".
-   */
-  RobotsCommand() {
-    super("robots");
-  }
-
-  /**
    * Gets the singleton instance of RobotsCommand.
    * 
    * @return The singleton instance of RobotsCommand
@@ -36,8 +28,16 @@ public class RobotsCommand extends Command {
     return instance;
   }
 
+  /**
+   * Private constructor for RobotsCommand.
+   * Sets the command name to "robots".
+   */
+  RobotsCommand() {
+    super("robots");
+  }
+
   @Override
-  public JsonObject execute(World world) {
+  public JsonObject execute(final World world) {
     return null;
   }
 
@@ -46,12 +46,12 @@ public class RobotsCommand extends Command {
    *
    * @param world the world to be printed
    */
-  public void printRobots(World world) {
+  public void printRobots(final World world) {
     if (world.getRobots().isEmpty()) {
       System.out.println("There are currently no Robots in the world. ");
     } else {
       System.out.println("Robots currently in the World: ");
-      for (Robot robot : world.getRobots()) {
+      for (final Robot robot : world.getRobots()) {
         System.out.print("name: " + robot.getName() + "\n" + formatState(robot.state()));
         System.out.println();
       }

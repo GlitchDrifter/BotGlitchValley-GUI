@@ -14,14 +14,6 @@ public class ReloadCommand extends Command {
   private static ReloadCommand instance;
 
   /**
-   * Private constructor for ReloadCommand.
-   * Sets the command name to "reload".
-   */
-  private ReloadCommand() {
-    super("reload");
-  }
-
-  /**
    * Gets the singleton instance of ReloadCommand.
    *
    * @return The singleton instance of ReloadCommand
@@ -34,6 +26,14 @@ public class ReloadCommand extends Command {
   }
 
   /**
+   * Private constructor for ReloadCommand.
+   * Sets the command name to "reload".
+   */
+  private ReloadCommand() {
+    super("reload");
+  }
+
+  /**
    * Executes the reload command in the given world.
    * It reloads the shots and returns the result.
    *
@@ -41,9 +41,9 @@ public class ReloadCommand extends Command {
    * @return a JsonObject containing the result of the fire command
    */
   @Override
-  public JsonObject execute(World world) {
-    JsonObject response = new JsonObject();
-    JsonObject data = new JsonObject();
+  public JsonObject execute(final World world) {
+    final JsonObject response = new JsonObject();
+    final JsonObject data = new JsonObject();
     String result, message;
 
     if (world.getCurrentRobot().reload()) {

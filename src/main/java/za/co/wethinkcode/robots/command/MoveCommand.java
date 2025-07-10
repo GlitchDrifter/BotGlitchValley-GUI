@@ -23,16 +23,6 @@ public class MoveCommand extends Command {
   private static MoveCommand instance;
 
   /**
-   * Private constructor to create a Move command with a name and an argument.
-   *
-   * @param name     the name of the command
-   * @param argument the argument for the command
-   */
-  private MoveCommand(String name, String argument) {
-    super(name, argument);
-  }
-
-  /**
    * Factory method that creates a new instance of MoveCommand for the specified
    * direction with the given steps.
    * 
@@ -43,7 +33,7 @@ public class MoveCommand extends Command {
    * @throws IllegalArgumentException if the direction is not "forward", "back",
    *                                  or "backward"
    */
-  public static synchronized MoveCommand getInstance(String name, String steps) {
+  public static synchronized MoveCommand getInstance(final String name, final String steps) {
     if (instance == null) {
       if ("forward".equalsIgnoreCase(name) || "back".equalsIgnoreCase(name) || "backward".equalsIgnoreCase(name)) {
         setInstance(new MoveCommand(name.toLowerCase(), steps));
@@ -56,8 +46,18 @@ public class MoveCommand extends Command {
     return instance;
   }
 
-  public static void setInstance(MoveCommand instance) {
+  public static void setInstance(final MoveCommand instance) {
     MoveCommand.instance = instance;
+  }
+
+  /**
+   * Private constructor to create a Move command with a name and an argument.
+   *
+   * @param name     the name of the command
+   * @param argument the argument for the command
+   */
+  private MoveCommand(final String name, final String argument) {
+    super(name, argument);
   }
 
   /**
@@ -70,12 +70,12 @@ public class MoveCommand extends Command {
    * @return a JsonObject containing the result of the command execution
    */
   @Override
-  public JsonObject execute(World world) {
-    JsonObject response = new JsonObject();
-    JsonObject data = new JsonObject();
+  public JsonObject execute(final World world) {
+    final JsonObject response = new JsonObject();
+    final JsonObject data = new JsonObject();
     if (getArgument().isEmpty())
       setArgument("0");
-    int nrSteps = Integer.parseInt(getArgument());
+    final int nrSteps = Integer.parseInt(getArgument());
 
     if (nrSteps <= 0) {
       response.addProperty("result", "ERROR");
@@ -87,7 +87,7 @@ public class MoveCommand extends Command {
     if (getName().equals("back") || getName().equals("backward")) {
       directionMultiplier = -1;
     }
-    UpdateResponse result = world.updatePosition(nrSteps * directionMultiplier);
+    final UpdateResponse result = world.updatePosition(nrSteps * directionMultiplier);
     String message = "";
     if (result == SUCCESS) {
       message = "Done";

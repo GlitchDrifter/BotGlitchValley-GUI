@@ -60,7 +60,7 @@ public class WorldGUI {
    *
    * @param world the world instance to visualize
    */
-  public WorldGUI(World world) {
+  public WorldGUI(final World world) {
     this.world = world;
 
     // Load obstacle icons
@@ -69,15 +69,15 @@ public class WorldGUI {
     pitIcon = getImage("/pit.png");
 
     // Create obstacle legend labels
-    JLabel legendPic1 = new JLabel("- Lake", waterIcon, JLabel.LEFT);
-    JLabel legendPic2 = new JLabel("- Mountain", mountainIcon, JLabel.LEFT);
-    JLabel legendPic3 = new JLabel("- Bottomless Pit", pitIcon, JLabel.LEFT);
+    final JLabel legendPic1 = new JLabel("- Lake", waterIcon, JLabel.LEFT);
+    final JLabel legendPic2 = new JLabel("- Mountain", mountainIcon, JLabel.LEFT);
+    final JLabel legendPic3 = new JLabel("- Bottomless Pit", pitIcon, JLabel.LEFT);
 
-    int height = world.getBOTTOM_RIGHT().getY() + 1;
-    int width = world.getBOTTOM_RIGHT().getX() + 1;
+    final int height = world.getBOTTOM_RIGHT().getY() + 1;
+    final int width = world.getBOTTOM_RIGHT().getX() + 1;
 
     // Setup the top status panel
-    JPanel statusPanel = new JPanel(new GridLayout(5, 1));
+    final JPanel statusPanel = new JPanel(new GridLayout(5, 1));
     statusPanel.add(new JLabel("World Size: " + width + "x" + height));
     statusPanel.add(robotList);
     statusPanel.add(legendPic1);
@@ -85,7 +85,7 @@ public class WorldGUI {
     statusPanel.add(legendPic3);
 
     // Setup grid layout to represent the world
-    JPanel worldGridPanel = new JPanel(new GridLayout(height, width));
+    final JPanel worldGridPanel = new JPanel(new GridLayout(height, width));
     gridCells = new JPanel[height][width];
     cellLabels = new JLabel[height][width];
 
@@ -96,7 +96,7 @@ public class WorldGUI {
         gridCells[y][x].setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
         gridCells[y][x].setBackground(Color.WHITE);
 
-        JLabel label = new JLabel();
+        final JLabel label = new JLabel();
         cellLabels[y][x] = label;
         gridCells[y][x].add(label);
 
@@ -106,9 +106,9 @@ public class WorldGUI {
 
     // Assign initial robot avatars and store positions
     int avatarIndex = 0;
-    for (Robot r : world.getRobots()) {
-      String name = r.getName();
-      Position pos = r.getPosition();
+    for (final Robot r : world.getRobots()) {
+      final String name = r.getName();
+      final Position pos = r.getPosition();
       if (!robotSprites.containsKey(name)) {
         robotSprites.put(name, botAvatar[avatarIndex % botAvatar.length]);
         avatarIndex++;
@@ -120,11 +120,11 @@ public class WorldGUI {
     update(); // Initial robot rendering
 
     // Bottom control panel
-    JPanel controlPanel = new JPanel();
+    final JPanel controlPanel = new JPanel();
     controlPanel.add(new JButton("Quit Server"));
 
     // Main frame setup
-    JFrame frame = new JFrame();
+    final JFrame frame = new JFrame();
     frame.setLayout(new BorderLayout());
     frame.add(statusPanel, BorderLayout.NORTH);
     frame.add(worldGridPanel, BorderLayout.CENTER);
@@ -144,7 +144,7 @@ public class WorldGUI {
 
     // Assign avatars to newly added robots
     int index = robotSprites.size();
-    for (Robot r : world.getRobots()) {
+    for (final Robot r : world.getRobots()) {
       if (!robotSprites.containsKey(r.getName())) {
         robotSprites.put(r.getName(), botAvatar[index % botAvatar.length]);
         index++;
@@ -152,38 +152,38 @@ public class WorldGUI {
     }
 
     // Clear icons at old positions if robot moved
-    for (Robot r : world.getRobots()) {
-      String name = r.getName();
-      Position newPos = r.getPosition();
-      Position oldPos = botPreviousPos.get(name);
+    for (final Robot r : world.getRobots()) {
+      final String name = r.getName();
+      final Position newPos = r.getPosition();
+      final Position oldPos = botPreviousPos.get(name);
       if (oldPos != null && !oldPos.equals(newPos)) {
         cellLabels[oldPos.getY()][oldPos.getX()].setIcon(null);
       }
     }
 
     // Clear icons of dead robots
-    for (String name : botPreviousPos.keySet()) {
+    for (final String name : botPreviousPos.keySet()) {
       boolean isDeadBot = true;
-      for (Robot r : world.getRobots()) {
+      for (final Robot r : world.getRobots()) {
         if (r.getName().equals(name)) {
           isDeadBot = false;
           break;
         }
       }
       if (isDeadBot) {
-        int y = botPreviousPos.get(name).getY();
-        int x = botPreviousPos.get(name).getX();
+        final int y = botPreviousPos.get(name).getY();
+        final int x = botPreviousPos.get(name).getX();
         cellLabels[y][x].setIcon(null);
       }
     }
 
     // Draw robot icons at new positions
-    for (Robot r : world.getRobots()) {
-      String name = r.getName();
-      Position pos = r.getPosition();
-      ImageIcon sprite = robotSprites.get(name);
+    for (final Robot r : world.getRobots()) {
+      final String name = r.getName();
+      final Position pos = r.getPosition();
+      final ImageIcon sprite = robotSprites.get(name);
 
-      JLabel cellLabel = cellLabels[pos.getY()][pos.getX()];
+      final JLabel cellLabel = cellLabels[pos.getY()][pos.getX()];
       cellLabel.setIcon(sprite);
       cellLabel.setToolTipText(name); // Show robot name on hover
 
@@ -197,7 +197,7 @@ public class WorldGUI {
    * Draws all obstacles in the world using their associated icons.
    */
   private void drawObstacles() {
-    for (Obstacle o : world.getObstacles()) {
+    for (final Obstacle o : world.getObstacles()) {
       for (int y = o.getTopLeft().getY(); y <= o.getBottomRight().getY(); y++) {
         for (int x = o.getTopLeft().getX(); x <= o.getBottomRight().getX(); x++) {
           switch (o.getType()) {
@@ -215,8 +215,8 @@ public class WorldGUI {
    * Loads the robot names into the top panel's robot list label.
    */
   private void robotListLoad() {
-    StringBuilder robotsStr = new StringBuilder("Robots (" + world.getRobots().size() + "): ");
-    for (Robot r : world.getRobots()) {
+    final StringBuilder robotsStr = new StringBuilder("Robots (" + world.getRobots().size() + "): ");
+    for (final Robot r : world.getRobots()) {
       robotsStr.append(r.getName()).append(" ,");
     }
     robotList.setText(robotsStr.toString());
@@ -228,9 +228,9 @@ public class WorldGUI {
    * @param filepath the path to the image file
    * @return a scaled ImageIcon
    */
-  private ImageIcon getImage(String filepath) {
-    ImageIcon imageIcon = new ImageIcon(Objects.requireNonNull(WorldGUI.class.getResource(filepath)));
-    Image originalImage = imageIcon.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH);
+  private ImageIcon getImage(final String filepath) {
+    final ImageIcon imageIcon = new ImageIcon(Objects.requireNonNull(WorldGUI.class.getResource(filepath)));
+    final Image originalImage = imageIcon.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH);
     return new ImageIcon(originalImage);
   }
 }

@@ -44,8 +44,8 @@ public class Server implements Runnable {
    * @throws IOException If an I/O error occurs when creating the input/output
    *                     streams.
    */
-  public Server(Socket socket, World worldInstance) throws IOException {
-    String clientMachine = socket.getInetAddress().getHostName();
+  public Server(final Socket socket, final World worldInstance) throws IOException {
+    final String clientMachine = socket.getInetAddress().getHostName();
     System.out.println("Connection from " + clientMachine);
     MultiServers.printServerPrompt();
     world = worldInstance;
@@ -60,24 +60,24 @@ public class Server implements Runnable {
         BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
       String messageFromClient;
       while ((messageFromClient = in.readLine()) != null) {
-        JsonObject request = JsonParser.parseString(messageFromClient).getAsJsonObject();
+        final JsonObject request = JsonParser.parseString(messageFromClient).getAsJsonObject();
         robotName = request.get("robot").getAsString();
         if (!MultiServers.clientHandlerMap.containsKey(robotName)) {
           MultiServers.clientHandlerMap.put(robotName, this);
         }
-        String commandName = request.get("command").getAsString();
-        JsonArray args = request.get("arguments").getAsJsonArray();
+        final String commandName = request.get("command").getAsString();
+        final JsonArray args = request.get("arguments").getAsJsonArray();
 
         world.setCurrentRobotByName(robotName);
-        JsonObject response = handleCommand(commandName, args);
+        final JsonObject response = handleCommand(commandName, args);
         MultiServers.printServerPrompt();
         world.deleteDeadBots();
         System.out.println(formatServerResponse(response));
         out.println(response);
       }
-    } catch (SocketException e) {
+    } catch (final SocketException e) {
       System.out.println("Client Socket has been closed " + e.getMessage());
-    } catch (IOException ex) {
+    } catch (final IOException ex) {
       System.out.println("Error with taking input " + ex.getMessage());
       throw new RuntimeException(ex);
     }
@@ -89,18 +89,18 @@ public class Server implements Runnable {
    * It includes the current state of the robot in the response.
    */
   public void sendRepairMessage() {
-    JsonObject response = new JsonObject();
-    JsonObject data = new JsonObject();
+    final JsonObject response = new JsonObject();
+    final JsonObject data = new JsonObject();
     response.addProperty("result", "OK");
     data.addProperty("message", "Done");
     response.add("data", data);
     response.add("state", world.getCurrentRobot().state());
 
     try {
-      PrintStream out = new PrintStream(socket.getOutputStream());
+      final PrintStream out = new PrintStream(socket.getOutputStream());
       out.println(response);
 
-    } catch (IOException e) {
+    } catch (final IOException e) {
       System.out.println("Repair message unable to send" + e);
       throw new RuntimeException(e);
     }
@@ -112,18 +112,18 @@ public class Server implements Runnable {
    * It includes the current state of the robot in the response.
    */
   public void sendReloadMessage() {
-    JsonObject response = new JsonObject();
-    JsonObject data = new JsonObject();
+    final JsonObject response = new JsonObject();
+    final JsonObject data = new JsonObject();
     response.addProperty("result", "OK");
     data.addProperty("message", "Done");
     response.add("data", data);
     response.add("state", world.getCurrentRobot().state());
 
     try {
-      PrintStream out = new PrintStream(socket.getOutputStream());
+      final PrintStream out = new PrintStream(socket.getOutputStream());
       out.println(response);
 
-    } catch (IOException e) {
+    } catch (final IOException e) {
       System.out.println("Reload message unable to send" + e);
       throw new RuntimeException(e);
     }
@@ -134,18 +134,18 @@ public class Server implements Runnable {
    * It also removes the robot from the client handler map.
    */
   public void sendQuit() {
-    JsonObject response = new JsonObject();
-    JsonObject data = new JsonObject();
+    final JsonObject response = new JsonObject();
+    final JsonObject data = new JsonObject();
     response.addProperty("result", "OK");
     data.addProperty("message", "QUIT");
     response.add("data", data);
 
     try {
-      PrintStream out = new PrintStream(socket.getOutputStream());
+      final PrintStream out = new PrintStream(socket.getOutputStream());
       out.println(response);
       socket.close(); // Close the socket to terminate client
       MultiServers.clientHandlerMap.remove(robotName); // Clean up map
-    } catch (IOException e) {
+    } catch (final IOException e) {
       System.out.println("Quit message unable to send" + e);
       throw new RuntimeException(e);
     }
@@ -158,16 +158,16 @@ public class Server implements Runnable {
    * @param args        The arguments for the command.
    * @return A JsonObject containing the response to be sent back to the client.
    */
-  private JsonObject handleCommand(String commandName, JsonArray args) {
+  private JsonObject handleCommand(final String commandName, final JsonArray args) {
     JsonObject response = new JsonObject();
-    JsonObject data = new JsonObject();
+    final JsonObject data = new JsonObject();
     System.out.println("\nName: " + robotName + " , Command: " + commandName + " , Arguments: " + args);
     Command command;
 
     try {
       switch (commandName) {
         case "launch" -> {
-          for (Robot robot : world.getRobots()) {
+          for (final Robot robot : world.getRobots()) {
             if (robot.getName().equals(robotName)) {
               response.addProperty("result", "ERROR");
               data.addProperty("message", "Too many of you in this world");
@@ -196,7 +196,7 @@ public class Server implements Runnable {
         default -> throw new IllegalArgumentException("Unsupported command");
       }
 
-    } catch (Exception e) {
+    } catch (final Exception e) {
       response.addProperty("result", "ERROR");
       data.addProperty("message", "Invalid command arguments");
       response.add("data", data);
@@ -204,7 +204,7 @@ public class Server implements Runnable {
     }
     response = command.execute(world);
 
-    Robot currentRobot = world.getCurrentRobot();
+    final Robot currentRobot = world.getCurrentRobot();
 
     if (response.has("result") && "OK".equals(response.get("result").getAsString())) {
       response.add("state", currentRobot.state());

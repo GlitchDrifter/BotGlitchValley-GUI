@@ -15,14 +15,6 @@ public class HelpCommand extends Command {
   private static HelpCommand instance;
 
   /**
-   * Private constructor for HelpCommand.
-   * Sets the command name to "help".
-   */
-  private HelpCommand() {
-    super("help");
-  }
-
-  /**
    * Gets the singleton instance of HelpCommand.
    * 
    * @return The singleton instance of HelpCommand
@@ -31,6 +23,14 @@ public class HelpCommand extends Command {
     if (instance == null)
       instance = new HelpCommand();
     return instance;
+  }
+
+  /**
+   * Private constructor for HelpCommand.
+   * Sets the command name to "help".
+   */
+  private HelpCommand() {
+    super("help");
   }
 
   /**
@@ -43,11 +43,11 @@ public class HelpCommand extends Command {
    *         a "result" of "OK".
    */
   @Override
-  public JsonObject execute(World world) {
-    JsonObject response = new JsonObject();
-    JsonObject data = new JsonObject();
+  public JsonObject execute(final World world) {
+    final JsonObject response = new JsonObject();
+    final JsonObject data = new JsonObject();
 
-    String helpMessage = """
+    final String helpMessage = """
         I can understand these commands:
           HELP                - Show this help message.
           STATE               - Ask for the robot's current state.

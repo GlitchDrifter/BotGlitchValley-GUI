@@ -18,15 +18,15 @@ import za.co.wethinkcode.robots.robot.Robot;
  * including obstacles and robots.
  */
 public class AsciiWorld {
-  private StringBuilder content = new StringBuilder();
-  private World world;
+  private final StringBuilder content = new StringBuilder();
+  private final World world;
 
   /**
    * Constructor for AsciiWorld.
    * 
    * @param world The World object representing the current state of the world.
    */
-  public AsciiWorld(World world) {
+  public AsciiWorld(final World world) {
     this.world = world;
     content.append("\n------Legend-------\n" +
         "MOUNTAIN :      '^'\n" +
@@ -47,10 +47,10 @@ public class AsciiWorld {
    * Generates an ASCII representation of the world and writes it to a text file.
    */
   public void printToTxt() {
-    int width = WIDTH; // Use WIDTH from Config
-    int height = HEIGHT; // Use HEIGHT from Config
+    final int width = WIDTH; // Use WIDTH from Config
+    final int height = HEIGHT; // Use HEIGHT from Config
 
-    String[][] grid = new String[height][width];
+    final String[][] grid = new String[height][width];
 
     for (int y = 0; y < height; y++) {
       for (int x = 0; x < width; x++) {
@@ -58,10 +58,10 @@ public class AsciiWorld {
       }
     }
 
-    for (Obstacle obstacle : world.getObstacles()) {
-      Position topLeft = obstacle.getTopLeft();
-      Position bottomRight = obstacle.getBottomRight();
-      String chr = switch (obstacle.getType()) {
+    for (final Obstacle obstacle : world.getObstacles()) {
+      final Position topLeft = obstacle.getTopLeft();
+      final Position bottomRight = obstacle.getBottomRight();
+      final String chr = switch (obstacle.getType()) {
         case MOUNTAIN -> "^";
         case LAKE -> "~";
         case BOTTOMLESS_PIT -> "■";
@@ -76,9 +76,9 @@ public class AsciiWorld {
       }
     }
 
-    for (Robot robot : world.getBots()) {
-      Position pos = robot.getPosition();
-      char firstLetter = Character.toUpperCase(robot.getName().charAt(0));
+    for (final Robot robot : world.getBots()) {
+      final Position pos = robot.getPosition();
+      final char firstLetter = Character.toUpperCase(robot.getName().charAt(0));
       grid[pos.getY()][pos.getX()] = String.valueOf(firstLetter);
 
     }
@@ -102,7 +102,7 @@ public class AsciiWorld {
     try (FileWriter writer = new FileWriter("Ascii-World.txt")) {
       writer.write(content.toString());
       System.out.println("\nSuccessfully wrote world to Ascii-World.txt");
-    } catch (IOException e) {
+    } catch (final IOException e) {
       System.out.println("\nFailed to write to file: " + e.getMessage());
     }
   }
@@ -116,7 +116,7 @@ public class AsciiWorld {
    * @param height The height of the grid.
    * @return true if the coordinates are inside the grid, false otherwise.
    */
-  private boolean isInsideGrid(int x, int y, int width, int height) {
+  private boolean isInsideGrid(final int x, final int y, final int width, final int height) {
     return x >= 0 && x < width && y >= 0 && y < height;
   }
 }

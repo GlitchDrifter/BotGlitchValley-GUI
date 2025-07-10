@@ -22,7 +22,7 @@ public class ObjectDetail {
    * @param distance  the distance to the object
    * @param direction the direction of the object
    */
-  ObjectDetail(String type, int distance, Direction direction) {
+  ObjectDetail(final String type, final int distance, final Direction direction) {
     this.type = type;
     this.distance = distance;
     this.direction = direction;

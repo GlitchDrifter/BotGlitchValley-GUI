@@ -20,14 +20,6 @@ public class FireCommand extends Command {
   private static FireCommand instance;
 
   /**
-   * Private constructor for FireCommand.
-   * Sets the command name to "fire".
-   */
-  private FireCommand() {
-    super("fire");
-  }
-
-  /**
    * Gets the singleton instance of FireCommand.
    * 
    * @return The singleton instance of FireCommand
@@ -39,6 +31,14 @@ public class FireCommand extends Command {
   }
 
   /**
+   * Private constructor for FireCommand.
+   * Sets the command name to "fire".
+   */
+  private FireCommand() {
+    super("fire");
+  }
+
+  /**
    * Executes the fire command in the given world.
    * It checks if the current robot can hit another robot and returns the result.
    *
@@ -46,11 +46,11 @@ public class FireCommand extends Command {
    * @return a JsonObject containing the result of the fire command
    */
   @Override
-  public JsonObject execute(World world) {
-    JsonObject response = new JsonObject();
-    JsonObject data = new JsonObject();
+  public JsonObject execute(final World world) {
+    final JsonObject response = new JsonObject();
+    final JsonObject data = new JsonObject();
 
-    Robot currentRobot = world.getCurrentRobot();
+    final Robot currentRobot = world.getCurrentRobot();
     if (currentRobot == null) {
       response.addProperty("result", "ERROR");
       data.addProperty("message", "Cannot perform 'fire': No robot context active.");
@@ -61,7 +61,7 @@ public class FireCommand extends Command {
     String message = "Miss";
     boolean hitObstacle = false;
 
-    for (Obstacle obstacle : world.getObstacles()) {
+    for (final Obstacle obstacle : world.getObstacles()) {
       if (obstacle.getType() == ObstacleType.MOUNTAIN) {
         int x = 1, y = 1;
         for (int i = 1; i < currentRobot.getBulletDistance(); i++) {
@@ -85,7 +85,7 @@ public class FireCommand extends Command {
       }
     }
     if (!hitObstacle) {
-      for (Robot robot : world.getBots()) {
+      for (final Robot robot : world.getBots()) {
         if (currentRobot.equals(robot))
           continue;
         if (currentRobot.getShots() > 0) {

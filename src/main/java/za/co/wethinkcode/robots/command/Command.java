@@ -23,7 +23,7 @@ public abstract class Command {
    *
    * @param name the name of the command
    */
-  protected Command(String name) {
+  protected Command(final String name) {
     this.name = name.trim().toLowerCase();
   }
 
@@ -35,7 +35,7 @@ public abstract class Command {
    * @param name     the name of the command
    * @param argument the argument for the command
    */
-  protected Command(String name, String argument) {
+  protected Command(final String name, final String argument) {
     this(name);
     this.argument = argument != null ? argument.trim() : null;
   }
@@ -50,7 +50,7 @@ public abstract class Command {
    * @param argument  the argument for the command
    * @param arguments a JsonArray of additional arguments for the command
    */
-  protected Command(String name, String argument, JsonArray arguments) {
+  protected Command(final String name, final String argument, final JsonArray arguments) {
     this(name, argument);
     this.arguments = arguments;
   }
@@ -60,7 +60,7 @@ public abstract class Command {
    *
    * @param argument the argument to set
    */
-  public void setArgument(String argument) {
+  public void setArgument(final String argument) {
     this.argument = argument;
   }
 
@@ -69,7 +69,7 @@ public abstract class Command {
    *
    * @param arguments the JsonArray of arguments to set
    */
-  public void setArguments(JsonArray arguments) {
+  public void setArguments(final JsonArray arguments) {
     this.arguments = arguments;
   }
 
@@ -78,7 +78,7 @@ public abstract class Command {
    *
    * @param name the name to set
    */
-  public void setName(String name) {
+  public void setName(final String name) {
     this.name = name;
   }
 

@@ -25,7 +25,8 @@ public class Obstacle {
    * @param bottomRightY the y-coordinate of the bottom-right corner
    * @param type         - type of obstacle
    */
-  public Obstacle(int topLeftX, int topLeftY, int bottomRightX, int bottomRightY, ObstacleType type) {
+  public Obstacle(final int topLeftX, final int topLeftY, final int bottomRightX, final int bottomRightY,
+      final ObstacleType type) {
     this.topLeftX = topLeftX;
     this.topLeftY = topLeftY;
     this.bottomRightX = bottomRightX;
@@ -44,7 +45,7 @@ public class Obstacle {
    * @param size     - size of obstacle
    * @param type     - type of obstacle [Mountain,lake,pit]
    */
-  public Obstacle(int topLeftX, int topLeftY, int size, ObstacleType type) {
+  public Obstacle(final int topLeftX, final int topLeftY, final int size, final ObstacleType type) {
     this.topLeftX = topLeftX;
     this.topLeftY = topLeftY;
     this.obstacleSize = size;
@@ -93,7 +94,7 @@ public class Obstacle {
    * @param position the position to check
    * @return return `true` if the x,y coordinate falls within the obstacle's area
    */
-  public boolean blocksPosition(Position position) {
+  public boolean blocksPosition(final Position position) {
     return position.getX() >= this.topLeftX && position.getX() <= this.bottomRightX && position.getY() >= this.topLeftY
         && position.getY() <= this.bottomRightY;
   }
@@ -108,7 +109,7 @@ public class Obstacle {
    * @param b second position
    * @return `true` if this obstacle is in the way
    */
-  public boolean blocksPath(Position a, Position b) {
+  public boolean blocksPath(final Position a, final Position b) {
     if (a.getX() == b.getX()) {
       return a.getX() >= this.topLeftX && a.getX() <= this.bottomRightX
           && ((a.getY() >= this.topLeftY && b.getY() <= this.bottomRightY)
@@ -128,7 +129,7 @@ public class Obstacle {
    *                        current
    * @return - boolean true/false [if anotherObstacle overlaps the other]
    */
-  public boolean isOverlapping(Obstacle anotherObstacle) {
+  public boolean isOverlapping(final Obstacle anotherObstacle) {
 
     for (int x = anotherObstacle.getTopLeft().getX(); x < anotherObstacle.getBottomRight().getX(); x++) {
       for (int y = anotherObstacle.getTopLeft().getY(); y < anotherObstacle.getBottomRight().getY(); y++) {
@@ -147,8 +148,8 @@ public class Obstacle {
    */
   @Override
   public String toString() {
-    Position topLeft = new Position(topLeftX, topLeftY);
-    Position bottomRight = new Position(bottomRightX, bottomRightY);
+    final Position topLeft = new Position(topLeftX, topLeftY);
+    final Position bottomRight = new Position(bottomRightX, bottomRightY);
     return type + " : { " + "TopLeft-> " + topLeft + " BottomRight-> " + bottomRight + " } ";
   }
 

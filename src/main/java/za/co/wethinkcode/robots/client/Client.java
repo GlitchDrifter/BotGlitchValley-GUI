@@ -28,7 +28,7 @@ public class Client {
 
   private static String robotName;
 
-  public static void main(String[] args) {
+  public static void main(final String[] args) {
     loadConfig("config.properties");
 
     try (
@@ -42,31 +42,111 @@ public class Client {
       launchRobot(scanner, out, in);
 
       // Start server listener thread
-      Thread serverListener = new Thread(() -> listenToServer(in));
+      final Thread serverListener = new Thread(() -> listenToServer(in));
       serverListener.setDaemon(true);
       serverListener.start();
 
       // Main command loop
       while (true) {
-        String userCommand = scanner.nextLine().trim().toLowerCase();
+        final String userCommand = scanner.nextLine().trim().toLowerCase();
         if (userCommand.isEmpty())
           continue;
 
         try {
-          JsonObject request = buildJsonCommand(userCommand, robotName);
+          final JsonObject request = buildJsonCommand(userCommand, robotName);
           out.println(request);
           out.flush();
 
-        } catch (Exception e) {
+        } catch (final Exception e) {
           System.out.println("Invalid command format. " + e.getMessage());
           System.out.print(robotName + " > Enter command: ");
         }
 
       }
 
-    } catch (IOException e) {
+    } catch (final IOException e) {
       System.out.println("Client failed to connect or communicate. " + e.getMessage());
     }
+  }
+
+  /**
+   * Formats the server response for client display.
+   * This method is similar to formatResponse but specifically formats the
+   * response for the client side.
+   *
+   * @param responseJson The JSON response from the server
+   * @return A formatted string representation of the server response for the
+   *         client
+   */
+  public static String formatServerResponse(final JsonObject responseJson) {
+    final StringBuilder formatted = new StringBuilder("\n< Client Response:\n");
+
+    final String result = responseJson.has("result") ? responseJson.get("result").getAsString() : "N/A";
+    formatted.append("  Result: ").append(result).append("\n");
+
+    if (responseJson.has("data") && responseJson.get("data").isJsonObject()) {
+      formatted.append(formatData(responseJson.getAsJsonObject("data")));
+    }
+
+    if (responseJson.has("state") && responseJson.get("state").isJsonObject()) {
+      formatted.append(formatState(responseJson.getAsJsonObject("state")));
+    }
+    formatted.append("Server Command> ");
+
+    return formatted.toString();
+  }
+
+  /**
+   * Formats the state section of the server response.
+   * This method extracts and formats the robot's state information.
+   *
+   * @param state The JSON object containing the robot's state
+   * @return A formatted string representation of the robot's state
+   */
+  public static String formatState(final JsonObject state) {
+    final StringBuilder stateOut = new StringBuilder("  State:\n");
+    if (robotName != null) {
+      stateOut.append("    - Name: ").append(robotName).append("\n");
+    }
+    stateOut.append("    - Position: ").append(state.has("position") ? state.get("position").toString() : "?")
+        .append("\n")
+        .append("    - Make: ").append(state.has("make") ? state.get("make").getAsString() : "?").append("\n")
+        .append("    - Direction: ").append(state.has("direction") ? state.get("direction").getAsString() : "?")
+        .append("\n")
+        .append("    - Shields: ").append(state.has("shields") ? state.get("shields").getAsString() : "?").append("\n")
+        .append("    - Shots: ").append(state.has("shots") ? state.get("shots").getAsString() : "?").append("\n")
+        .append("    - Status: ").append(state.has("status") ? state.get("status").getAsString() : "?").append("\n");
+
+    return stateOut.toString();
+  }
+
+  /**
+   * Formats the state section of the server response with a robot name.
+   * This method is similar to formatState but includes the robot's name in the
+   * output.
+   *
+   * @param state The JSON object containing the robot's state
+   * @param name  The name of the robot
+   * @return A formatted string representation of the robot's state with its name
+   */
+  public static String formatState(final JsonObject state, final String name) {
+    final StringBuilder stateOut = new StringBuilder();
+    if (name != null) {
+      stateOut.append("    - Robot: ").append(name).append("\n");
+    }
+    stateOut.append("  State of robot that's hit:\n")
+        .append("    - Position: ").append(state.has("position") ? state.get("position").toString() : "?").append("\n")
+        .append("    - Make: ").append(state.has("make") ? state.get("make").getAsString() : "?").append("\n")
+        .append("    - Direction: ").append(state.has("direction") ? state.get("direction").getAsString() : "?")
+        .append("\n")
+        .append("    - Shields: ").append(state.has("shields") ? state.get("shields").getAsString() : "?").append("\n")
+        .append("    - Shots: ").append(state.has("shots") ? state.get("shots").getAsString() : "?").append("\n");
+    if (!Objects.equals(state.get("status").getAsString(), "DEAD")) {
+      stateOut.append("    - Status: ").append(state.has("status") ? state.get("status").getAsString() : "?")
+          .append("\n");
+    }
+
+    return stateOut.toString();
   }
 
   /**
@@ -78,24 +158,24 @@ public class Client {
    * @param out     PrintStream for sending commands to the server
    * @param in      BufferedReader for receiving responses from the server
    */
-  private static void launchRobot(Scanner scanner, PrintStream out, BufferedReader in) {
+  private static void launchRobot(final Scanner scanner, final PrintStream out, final BufferedReader in) {
     while (true) {
       System.out.print("> Enter command: ");
-      String commandLine = scanner.nextLine().trim();
-      String[] splitCommand = commandLine.split(" ");
+      final String commandLine = scanner.nextLine().trim();
+      final String[] splitCommand = commandLine.split(" ");
 
       if (splitCommand.length != 3 || !splitCommand[0].equalsIgnoreCase("launch")) {
         System.out.println("Invalid command. Format: launch <robottype> <robotname>");
         continue;
       }
 
-      String robotType = splitCommand[1];
+      final String robotType = splitCommand[1];
       robotName = splitCommand[2];
 
-      JsonObject launchRequest = new JsonObject();
+      final JsonObject launchRequest = new JsonObject();
       launchRequest.addProperty("robot", robotName);
       launchRequest.addProperty("command", "launch");
-      JsonArray args = new JsonArray();
+      final JsonArray args = new JsonArray();
       args.add(robotType);
       launchRequest.add("arguments", args);
 
@@ -103,12 +183,12 @@ public class Client {
       out.flush();
 
       try {
-        String rawResponse = in.readLine();
-        JsonObject responseJson = JsonParser.parseString(rawResponse).getAsJsonObject();
-        String result = responseJson.has("result") ? responseJson.get("result").getAsString() : "";
+        final String rawResponse = in.readLine();
+        final JsonObject responseJson = JsonParser.parseString(rawResponse).getAsJsonObject();
+        final String result = responseJson.has("result") ? responseJson.get("result").getAsString() : "";
 
         if ("ERROR".equalsIgnoreCase(result)) {
-          String message = responseJson.getAsJsonObject("data").get("message").getAsString();
+          final String message = responseJson.getAsJsonObject("data").get("message").getAsString();
           if (message.toLowerCase().contains("too many of you in this world")) {
             System.out.println("❌ Name conflict: ");
             System.out.print(formatResponse(responseJson));
@@ -136,7 +216,7 @@ public class Client {
    *
    * @param in BufferedReader for receiving responses from the server
    */
-  private static void listenToServer(BufferedReader in) {
+  private static void listenToServer(final BufferedReader in) {
     try {
       String rawResponse;
       while ((rawResponse = in.readLine()) != null) {
@@ -146,8 +226,8 @@ public class Client {
         }
 
         try {
-          JsonObject responseJson = JsonParser.parseString(rawResponse).getAsJsonObject();
-          String formatted = formatResponse(responseJson);
+          final JsonObject responseJson = JsonParser.parseString(rawResponse).getAsJsonObject();
+          final String formatted = formatResponse(responseJson);
           System.out.print("\n" + formatted);
 
           if (formatted.contains("DEAD")) {
@@ -166,7 +246,7 @@ public class Client {
           System.out.println("  Raw: " + rawResponse + e.getMessage());
         }
       }
-    } catch (IOException e) {
+    } catch (final IOException e) {
       System.out.println("Disconnected from server. " + e.getMessage());
     }
   }
@@ -179,9 +259,9 @@ public class Client {
    * @param responseJson The JSON response from the server
    * @return A formatted string representation of the server response
    */
-  private static String formatResponse(JsonObject responseJson) {
-    StringBuilder formatted = new StringBuilder("< Server Response:\n");
-    String result = responseJson.has("result") ? responseJson.get("result").getAsString() : "N/A";
+  private static String formatResponse(final JsonObject responseJson) {
+    final StringBuilder formatted = new StringBuilder("< Server Response:\n");
+    final String result = responseJson.has("result") ? responseJson.get("result").getAsString() : "N/A";
     formatted.append("  Result: ").append(result).append("\n");
 
     if (responseJson.has("data") && responseJson.get("data").isJsonObject()) {
@@ -207,41 +287,14 @@ public class Client {
   }
 
   /**
-   * Formats the server response for client display.
-   * This method is similar to formatResponse but specifically formats the
-   * response for the client side.
-   *
-   * @param responseJson The JSON response from the server
-   * @return A formatted string representation of the server response for the
-   *         client
-   */
-  public static String formatServerResponse(JsonObject responseJson) {
-    StringBuilder formatted = new StringBuilder("\n< Client Response:\n");
-
-    String result = responseJson.has("result") ? responseJson.get("result").getAsString() : "N/A";
-    formatted.append("  Result: ").append(result).append("\n");
-
-    if (responseJson.has("data") && responseJson.get("data").isJsonObject()) {
-      formatted.append(formatData(responseJson.getAsJsonObject("data")));
-    }
-
-    if (responseJson.has("state") && responseJson.get("state").isJsonObject()) {
-      formatted.append(formatState(responseJson.getAsJsonObject("state")));
-    }
-    formatted.append("Server Command> ");
-
-    return formatted.toString();
-  }
-
-  /**
    * Formats the data section of the server response.
    * This method extracts and formats the message and objects seen by the robot.
    *
    * @param data The JSON object containing data from the server
    * @return A formatted string representation of the data
    */
-  private static String formatData(JsonObject data) {
-    StringBuilder out = new StringBuilder();
+  private static String formatData(final JsonObject data) {
+    final StringBuilder out = new StringBuilder();
 
     if (data.has("message")) {
       out.append("  Message: ").append(data.get("message").getAsString()).append("\n");
@@ -256,19 +309,19 @@ public class Client {
     }
 
     if (data.has("objects") && data.get("objects").isJsonArray()) {
-      JsonArray objects = data.getAsJsonArray("objects");
+      final JsonArray objects = data.getAsJsonArray("objects");
       out.append("  Objects Seen:\n");
 
       if (objects.isEmpty()) {
         out.append("    - Nothing detected.\n");
       } else {
-        for (JsonElement el : objects) {
-          JsonObject obj = el.getAsJsonObject();
-          String type = obj.has("type") ? obj.get("type").getAsString() : "?";
-          String dir = obj.has("direction") ? obj.get("direction").getAsString() : "?";
-          int dist = obj.has("distance") ? obj.get("distance").getAsInt() : -1;
+        for (final JsonElement el : objects) {
+          final JsonObject obj = el.getAsJsonObject();
+          final String type = obj.has("type") ? obj.get("type").getAsString() : "?";
+          final String dir = obj.has("direction") ? obj.get("direction").getAsString() : "?";
+          final int dist = obj.has("distance") ? obj.get("distance").getAsInt() : -1;
 
-          StringBuilder objectDescription = new StringBuilder();
+          final StringBuilder objectDescription = new StringBuilder();
           objectDescription.append(type);
 
           if (type.equals("OBSTACLE") && obj.has("obstacle_type")) {
@@ -293,59 +346,6 @@ public class Client {
   }
 
   /**
-   * Formats the state section of the server response.
-   * This method extracts and formats the robot's state information.
-   *
-   * @param state The JSON object containing the robot's state
-   * @return A formatted string representation of the robot's state
-   */
-  public static String formatState(JsonObject state) {
-    StringBuilder stateOut = new StringBuilder("  State:\n");
-    if (robotName != null) {
-      stateOut.append("    - Name: ").append(robotName).append("\n");
-    }
-    stateOut.append("    - Position: ").append(state.has("position") ? state.get("position").toString() : "?")
-        .append("\n")
-        .append("    - Make: ").append(state.has("make") ? state.get("make").getAsString() : "?").append("\n")
-        .append("    - Direction: ").append(state.has("direction") ? state.get("direction").getAsString() : "?")
-        .append("\n")
-        .append("    - Shields: ").append(state.has("shields") ? state.get("shields").getAsString() : "?").append("\n")
-        .append("    - Shots: ").append(state.has("shots") ? state.get("shots").getAsString() : "?").append("\n")
-        .append("    - Status: ").append(state.has("status") ? state.get("status").getAsString() : "?").append("\n");
-
-    return stateOut.toString();
-  }
-
-  /**
-   * Formats the state section of the server response with a robot name.
-   * This method is similar to formatState but includes the robot's name in the
-   * output.
-   *
-   * @param state The JSON object containing the robot's state
-   * @param name  The name of the robot
-   * @return A formatted string representation of the robot's state with its name
-   */
-  public static String formatState(JsonObject state, String name) {
-    StringBuilder stateOut = new StringBuilder();
-    if (name != null) {
-      stateOut.append("    - Robot: ").append(name).append("\n");
-    }
-    stateOut.append("  State of robot that's hit:\n")
-        .append("    - Position: ").append(state.has("position") ? state.get("position").toString() : "?").append("\n")
-        .append("    - Make: ").append(state.has("make") ? state.get("make").getAsString() : "?").append("\n")
-        .append("    - Direction: ").append(state.has("direction") ? state.get("direction").getAsString() : "?")
-        .append("\n")
-        .append("    - Shields: ").append(state.has("shields") ? state.get("shields").getAsString() : "?").append("\n")
-        .append("    - Shots: ").append(state.has("shots") ? state.get("shots").getAsString() : "?").append("\n");
-    if (!Objects.equals(state.get("status").getAsString(), "DEAD")) {
-      stateOut.append("    - Status: ").append(state.has("status") ? state.get("status").getAsString() : "?")
-          .append("\n");
-    }
-
-    return stateOut.toString();
-  }
-
-  /**
    * Builds a JSON command object based on the user input.
    * This method constructs a JSON object representing the command to be sent to
    * the server.
@@ -354,9 +354,9 @@ public class Client {
    * @param robotName The name of the robot
    * @return A JSON object representing the command
    */
-  private static JsonObject buildJsonCommand(String command, String robotName) {
-    String[] parts = command.split(" ");
-    JsonArray args = new JsonArray();
+  private static JsonObject buildJsonCommand(final String command, final String robotName) {
+    final String[] parts = command.split(" ");
+    final JsonArray args = new JsonArray();
 
     switch (parts[0]) {
       case "forward":
@@ -372,7 +372,7 @@ public class Client {
         break;
     }
 
-    JsonObject obj = new JsonObject();
+    final JsonObject obj = new JsonObject();
     obj.addProperty("robot", robotName);
     obj.addProperty("command", parts[0]);
     obj.add("arguments", args);

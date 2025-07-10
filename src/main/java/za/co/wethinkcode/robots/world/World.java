@@ -38,19 +38,11 @@ public class World {
   private WorldGUI gui;
   private final boolean GUI;
 
-  public Position getTOP_LEFT() {
-    return TOP_LEFT;
-  }
-
-  public Position getBOTTOM_RIGHT() {
-    return BOTTOM_RIGHT;
-  }
-
   /**
    * Constructor for the World class.
    * Initializes the maze and sets the boundaries of the world.
    */
-  public World(boolean GUI) {
+  public World(final boolean GUI) {
     this.maze = new Maze("");
     this.TOP_LEFT = new Position(0, 0);
     this.BOTTOM_RIGHT = new Position(HEIGHT - 1, WIDTH - 1);
@@ -61,13 +53,21 @@ public class World {
       gui = new WorldGUI(this);
   }
 
+  public Position getTOP_LEFT() {
+    return TOP_LEFT;
+  }
+
+  public Position getBOTTOM_RIGHT() {
+    return BOTTOM_RIGHT;
+  }
+
   /**
    * Sets the current robot by its name.
    * 
    * @param name The name of the robot to set as current.
    */
-  public void setCurrentRobotByName(String name) {
-    for (Robot robot : robots) {
+  public void setCurrentRobotByName(final String name) {
+    for (final Robot robot : robots) {
       if (robot.getName().equals(name)) {
         currentRobot = robot;
         break;
@@ -80,7 +80,7 @@ public class World {
    * 
    * @param robot The robot to set as current.
    */
-  public void setCurrentRobot(Robot robot) {
+  public void setCurrentRobot(final Robot robot) {
     currentRobot = robot;
   }
 
@@ -116,7 +116,7 @@ public class World {
    * 
    * @param robot The robot to add.
    */
-  public void addRobot(Robot robot) {
+  public void addRobot(final Robot robot) {
     robots.add(robot);
   }
 
@@ -127,8 +127,8 @@ public class World {
    * @param newPosition The new position to check.
    * @return true if the new position is allowed, false otherwise.
    */
-  public boolean isNewPositionAllowed(Position newPosition) {
-    for (Robot robot : robots) {
+  public boolean isNewPositionAllowed(final Position newPosition) {
+    for (final Robot robot : robots) {
       if (robot.getName().equals(currentRobot.getName()))
         continue;
       if (robot.getPosition().equals(newPosition))
@@ -149,7 +149,7 @@ public class World {
       }
     }
 
-    for (Obstacle obstacle : obstacleList) {
+    for (final Obstacle obstacle : obstacleList) {
       if ((newPosition.isIn(obstacle.getTopLeft(), obstacle.getBottomRight())
           || obstacle.blocksPath(currentRobot.getPosition(), newPosition))
           && obstacle.getType() != ObstacleType.BOTTOMLESS_PIT)
@@ -165,14 +165,14 @@ public class World {
    * @param newPosition The new position to check.
    * @return true if the new position is allowed, false otherwise.
    */
-  public boolean isLaunchAllowed(Position newPosition) {
-    for (Robot robot : robots) {
+  public boolean isLaunchAllowed(final Position newPosition) {
+    for (final Robot robot : robots) {
       if (robot.getName().equals(currentRobot.getName()))
         continue;
       if (robot.getPosition().equals(newPosition))
         return false;
     }
-    for (Obstacle obstacle : obstacleList) {
+    for (final Obstacle obstacle : obstacleList) {
       if (newPosition.isIn(obstacle.getTopLeft(), obstacle.getBottomRight()))
         return false;
     }
@@ -186,8 +186,8 @@ public class World {
    * @param newPos - new position that the bot is attempting to move to
    * @return boolean that states if bot can move or not.
    */
-  public boolean isMovementObstructed(Position newPos) {
-    for (Obstacle o : obstacleList) {
+  public boolean isMovementObstructed(final Position newPos) {
+    for (final Obstacle o : obstacleList) {
       if (o.getType() == ObstacleType.MOUNTAIN) {
         return newPos.isIn(o.getTopLeft(), o.getBottomRight());
       }
@@ -201,16 +201,16 @@ public class World {
    * @param nrSteps The number of steps to move.
    * @return An UpdateResponse indicating the result of the update.
    */
-  public UpdateResponse updatePosition(int nrSteps) {
+  public UpdateResponse updatePosition(final int nrSteps) {
 
-    Position oldPos = getCurrentRobot().getPosition();
-    Position pos = oldPos.newPos(currentRobot.getCurrentDirection(), nrSteps);
+    final Position oldPos = getCurrentRobot().getPosition();
+    final Position pos = oldPos.newPos(currentRobot.getCurrentDirection(), nrSteps);
 
     if (pos.isIn(TOP_LEFT, BOTTOM_RIGHT) && isNewPositionAllowed(pos)) {
       getCurrentRobot().setPosition(pos);
       if (GUI)
         gui.update();
-      for (Obstacle o : getObstacles()) {
+      for (final Obstacle o : getObstacles()) {
         if (o.getType() == ObstacleType.BOTTOMLESS_PIT && (o.blocksPosition(pos) || o.blocksPath(oldPos, pos))) {
           getCurrentRobot().setStatus(OperationalStatus.DEAD);
 

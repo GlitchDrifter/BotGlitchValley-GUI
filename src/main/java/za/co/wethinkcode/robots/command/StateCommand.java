@@ -15,14 +15,6 @@ public class StateCommand extends Command {
   private static StateCommand instance;
 
   /**
-   * Private constructor for StateCommand.
-   * Sets the command name to "state".
-   */
-  public StateCommand() {
-    super("state");
-  }
-
-  /**
    * Gets the singleton instance of StateCommand.
    * 
    * @return The singleton instance of StateCommand
@@ -35,6 +27,14 @@ public class StateCommand extends Command {
   }
 
   /**
+   * Private constructor for StateCommand.
+   * Sets the command name to "state".
+   */
+  public StateCommand() {
+    super("state");
+  }
+
+  /**
    * Executes the state command.
    * Checks if a current robot context exists and returns a basic success
    * or error JSON response. The detailed state is added later by the caller.
@@ -44,11 +44,11 @@ public class StateCommand extends Command {
    * @return A JsonObject indicating success or failure (if no robot is active).
    */
   @Override
-  public JsonObject execute(World world) {
-    JsonObject response = new JsonObject();
-    JsonObject data = new JsonObject();
+  public JsonObject execute(final World world) {
+    final JsonObject response = new JsonObject();
+    final JsonObject data = new JsonObject();
 
-    Robot currentRobot = world.getCurrentRobot();
+    final Robot currentRobot = world.getCurrentRobot();
 
     if (currentRobot == null) {
       response.addProperty("result", "ERROR");

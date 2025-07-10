@@ -38,7 +38,7 @@ public class MultiServers {
    *
    * @param args Command line arguments
    */
-  public static void main(String[] args) {
+  public static void main(final String[] args) {
     Config.loadConfig("config.properties");
     World worldInstance;
     if (args.length > 0) {
@@ -50,7 +50,7 @@ public class MultiServers {
 
     try {
       server.start(Config.PORT);
-    } catch (IOException e) {
+    } catch (final IOException e) {
       System.err.println("Failed to bind to port: " + e.getMessage());
       return;
     }
@@ -58,7 +58,7 @@ public class MultiServers {
     try (Scanner scanner = new Scanner(System.in)) {
       while (true) {
         System.out.print("Server Command> ");
-        String command = scanner.nextLine().toLowerCase().trim();
+        final String command = scanner.nextLine().toLowerCase().trim();
 
         switch (command) {
           case "quit":
@@ -67,7 +67,7 @@ public class MultiServers {
             server.broadcastMessage("quit");
             try {
               server.shutdown();
-            } catch (IOException e) {
+            } catch (final IOException e) {
               System.out.println("Error shutting down: " + e.getMessage());
             }
             System.exit(0);

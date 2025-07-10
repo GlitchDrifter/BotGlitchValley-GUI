@@ -30,11 +30,11 @@ public class Config {
    *
    * @param configFile The path to the configuration file.
    */
-  public static void loadConfig(String configFile) {
-    Properties properties = new Properties();
-    File rawFile = new File(configFile);
+  public static void loadConfig(final String configFile) {
+    final Properties properties = new Properties();
+    final File rawFile = new File(configFile);
 
-    File file = new File(rawFile.getAbsolutePath().replace("config.properties",
+    final File file = new File(rawFile.getAbsolutePath().replace("config.properties",
         "src/main/java/za/co/wethinkcode/robots/config/config.properties"));
 
     try (FileInputStream fileInputStream = new FileInputStream(file)) {
@@ -49,7 +49,7 @@ public class Config {
       MAX_SHIELD = Integer.parseInt(properties.getProperty("MAX_SHIELD"));
       MAX_SHOTS = Integer.parseInt(properties.getProperty("MAX_SHOTS"));
       OBSTACLE_MODE = properties.getProperty("OBSTACLE_MODE");
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw new RuntimeException(e);
     }
   }

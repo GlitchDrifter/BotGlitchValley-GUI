@@ -40,52 +40,18 @@ public class DetectedObjectDetails {
    * @param currentPos The current position of the robot
    * @param world      The world in which the robot exists
    */
-  public DetectedObjectDetails(Position currentPos, World world) {
+  public DetectedObjectDetails(final Position currentPos, final World world) {
     objectDetails = new CopyOnWriteArrayList<>();
 
-    Map<Direction, List<ObjectDetail>> obstaclesByDirection = detectObstacles(currentPos, world.getObstacles());
-    Map<Direction, List<ObjectDetail>> edgesByDirection = detectEdges(currentPos, obstaclesByDirection);
-    Map<Direction, List<ObjectDetail>> robotsByDirection = detectRobots(world.getBots(), currentPos,
+    final Map<Direction, List<ObjectDetail>> obstaclesByDirection = detectObstacles(currentPos, world.getObstacles());
+    final Map<Direction, List<ObjectDetail>> edgesByDirection = detectEdges(currentPos, obstaclesByDirection);
+    final Map<Direction, List<ObjectDetail>> robotsByDirection = detectRobots(world.getBots(), currentPos,
         obstaclesByDirection);
 
-    Map<Direction, List<ObjectDetail>> allObjectsByDirection = combineAndSortObjects(
+    final Map<Direction, List<ObjectDetail>> allObjectsByDirection = combineAndSortObjects(
         obstaclesByDirection, edgesByDirection, robotsByDirection);
 
     processObjectsByDirection(allObjectsByDirection);
-  }
-
-  /**
-   * Combines and sorts detected objects by direction and distance.
-   */
-  private Map<Direction, List<ObjectDetail>> combineAndSortObjects(
-      Map<Direction, List<ObjectDetail>> obstacles,
-      Map<Direction, List<ObjectDetail>> edges,
-      Map<Direction, List<ObjectDetail>> robots) {
-
-    Map<Direction, List<ObjectDetail>> allObjects = new EnumMap<>(Direction.class);
-    Arrays.stream(Direction.values()).forEach(dir -> {
-      List<ObjectDetail> objectsInDir = new ArrayList<>();
-      objectsInDir.addAll(obstacles.getOrDefault(dir, Collections.emptyList()));
-      objectsInDir.addAll(edges.getOrDefault(dir, Collections.emptyList()));
-      objectsInDir.addAll(robots.getOrDefault(dir, Collections.emptyList()));
-      objectsInDir.sort(Comparator.comparingInt(ObjectDetail::getDistance));
-      allObjects.put(dir, objectsInDir);
-    });
-    return allObjects;
-  }
-
-  /**
-   * Processes objects in each direction, stopping if a mountain is encountered.
-   */
-  private void processObjectsByDirection(Map<Direction, List<ObjectDetail>> allObjectsByDirection) {
-    allObjectsByDirection.forEach((dir, objectsInDir) -> {
-      for (ObjectDetail detail : objectsInDir) {
-        objectDetails.add(detail);
-        if (detail.getType().equals("MOUNTAIN")) {
-          break;
-        }
-      }
-    });
   }
 
   /**
@@ -94,9 +60,9 @@ public class DetectedObjectDetails {
    * @return A JsonArray containing details of all detected objects
    */
   public JsonArray getSeenObjectDetails() {
-    JsonArray objectsJsonArray = new JsonArray();
-    for (ObjectDetail detail : objectDetails) {
-      JsonObject foundObjectJson = new JsonObject();
+    final JsonArray objectsJsonArray = new JsonArray();
+    for (final ObjectDetail detail : objectDetails) {
+      final JsonObject foundObjectJson = new JsonObject();
       foundObjectJson.addProperty("direction", detail.getDirection().toString());
       foundObjectJson.addProperty("type", detail.getType());
       foundObjectJson.addProperty("distance", detail.getDistance());
@@ -109,6 +75,40 @@ public class DetectedObjectDetails {
   }
 
   /**
+   * Combines and sorts detected objects by direction and distance.
+   */
+  private Map<Direction, List<ObjectDetail>> combineAndSortObjects(
+      final Map<Direction, List<ObjectDetail>> obstacles,
+      final Map<Direction, List<ObjectDetail>> edges,
+      final Map<Direction, List<ObjectDetail>> robots) {
+
+    final Map<Direction, List<ObjectDetail>> allObjects = new EnumMap<>(Direction.class);
+    Arrays.stream(Direction.values()).forEach(dir -> {
+      final List<ObjectDetail> objectsInDir = new ArrayList<>();
+      objectsInDir.addAll(obstacles.getOrDefault(dir, Collections.emptyList()));
+      objectsInDir.addAll(edges.getOrDefault(dir, Collections.emptyList()));
+      objectsInDir.addAll(robots.getOrDefault(dir, Collections.emptyList()));
+      objectsInDir.sort(Comparator.comparingInt(ObjectDetail::getDistance));
+      allObjects.put(dir, objectsInDir);
+    });
+    return allObjects;
+  }
+
+  /**
+   * Processes objects in each direction, stopping if a mountain is encountered.
+   */
+  private void processObjectsByDirection(final Map<Direction, List<ObjectDetail>> allObjectsByDirection) {
+    allObjectsByDirection.forEach((dir, objectsInDir) -> {
+      for (final ObjectDetail detail : objectsInDir) {
+        objectDetails.add(detail);
+        if (detail.getType().equals("MOUNTAIN")) {
+          break;
+        }
+      }
+    });
+  }
+
+  /**
    * Finds all edges within the visible distance.
    *
    * @param currentPos           Current robot's position
@@ -116,13 +116,13 @@ public class DetectedObjectDetails {
    *                             blocking mountains
    * @return Map of directions to lists of detected edge details
    */
-  private Map<Direction, List<ObjectDetail>> detectEdges(Position currentPos,
-      Map<Direction, List<ObjectDetail>> obstaclesByDirection) {
-    Map<Direction, List<ObjectDetail>> edgesByDirection = new EnumMap<>(Direction.class);
-    int x = currentPos.getX();
-    int y = currentPos.getY();
+  private Map<Direction, List<ObjectDetail>> detectEdges(final Position currentPos,
+      final Map<Direction, List<ObjectDetail>> obstaclesByDirection) {
+    final Map<Direction, List<ObjectDetail>> edgesByDirection = new EnumMap<>(Direction.class);
+    final int x = currentPos.getX();
+    final int y = currentPos.getY();
 
-    Map<Direction, Boolean> edgeChecks = Map.of(
+    final Map<Direction, Boolean> edgeChecks = Map.of(
         NORTH, y - VISIBILITY < 0,
         WEST, x - VISIBILITY < 0,
         SOUTH, y + VISIBILITY >= HEIGHT,
@@ -130,8 +130,8 @@ public class DetectedObjectDetails {
 
     edgeChecks.forEach((direction, isEdgeVisible) -> {
       if (isEdgeVisible && !isDirectionBlockedByMountain(direction, obstaclesByDirection)) {
-        Position edgePos = getEdgePosition(currentPos, direction);
-        int distance = currentPos.distanceFrom(edgePos, direction);
+        final Position edgePos = getEdgePosition(currentPos, direction);
+        final int distance = currentPos.distanceFrom(edgePos, direction);
         if (isBehindMountain(direction, distance, obstaclesByDirection)) {
           edgesByDirection.computeIfAbsent(direction, k -> new ArrayList<>())
               .add(new ObjectDetail("EDGE", distance, direction));
@@ -148,9 +148,9 @@ public class DetectedObjectDetails {
    * @param direction  Direction to check
    * @return Position of the edge
    */
-  private Position getEdgePosition(Position currentPos, Direction direction) {
-    int x = currentPos.getX();
-    int y = currentPos.getY();
+  private Position getEdgePosition(final Position currentPos, final Direction direction) {
+    final int x = currentPos.getX();
+    final int y = currentPos.getY();
     return switch (direction) {
       case NORTH -> new Position(x, 0);
       case WEST -> new Position(0, y);
@@ -166,15 +166,16 @@ public class DetectedObjectDetails {
    * @param obstacles  List of obstacles in the world
    * @return Map of directions to lists of detected obstacle details
    */
-  private Map<Direction, List<ObjectDetail>> detectObstacles(Position currentPos, List<Obstacle> obstacles) {
-    Map<Direction, List<ObjectDetail>> obstaclesByDirection = new EnumMap<>(Direction.class);
+  private Map<Direction, List<ObjectDetail>> detectObstacles(final Position currentPos,
+      final List<Obstacle> obstacles) {
+    final Map<Direction, List<ObjectDetail>> obstaclesByDirection = new EnumMap<>(Direction.class);
     Arrays.stream(Direction.values()).forEach(dir -> obstaclesByDirection.put(dir, new ArrayList<>()));
 
     obstacles.forEach(obstacle -> Arrays.stream(Direction.values()).forEach(dir -> {
-      Position visibilityPos = currentPos.newPos(dir, VISIBILITY);
+      final Position visibilityPos = currentPos.newPos(dir, VISIBILITY);
       if (isObstacleInDirection(currentPos, obstacle, dir, visibilityPos)) {
-        Position refPoint = getObstacleReferencePoint(obstacle, dir);
-        int distance = currentPos.distanceFrom(refPoint, dir);
+        final Position refPoint = getObstacleReferencePoint(obstacle, dir);
+        final int distance = currentPos.distanceFrom(refPoint, dir);
         if (distance <= VISIBILITY) {
           obstaclesByDirection.get(dir).add(new ObjectDetail(obstacle.getType().toString(), distance, dir));
         }
@@ -188,9 +189,10 @@ public class DetectedObjectDetails {
   /**
    * Determines if an obstacle is potentially visible in a specific direction.
    */
-  private boolean isObstacleInDirection(Position currentPos, Obstacle obstacle, Direction dir, Position targetPos) {
-    Position topLeft = obstacle.getTopLeft();
-    Position bottomRight = obstacle.getBottomRight();
+  private boolean isObstacleInDirection(final Position currentPos, final Obstacle obstacle, final Direction dir,
+      final Position targetPos) {
+    final Position topLeft = obstacle.getTopLeft();
+    final Position bottomRight = obstacle.getBottomRight();
 
     return switch (dir) {
       case NORTH -> currentPos.getY() > bottomRight.getY() && targetPos.getY() <= bottomRight.getY() &&
@@ -207,14 +209,14 @@ public class DetectedObjectDetails {
   /**
    * Helper method to check if a value is between two bounds (inclusive).
    */
-  private boolean isBetween(int value, int min, int max) {
+  private boolean isBetween(final int value, final int min, final int max) {
     return value >= min && value <= max;
   }
 
   /**
    * Gets the reference point of an obstacle based on viewing direction.
    */
-  private Position getObstacleReferencePoint(Obstacle obstacle, Direction dir) {
+  private Position getObstacleReferencePoint(final Obstacle obstacle, final Direction dir) {
     return switch (dir) {
       case NORTH, WEST -> obstacle.getBottomRight();
       case SOUTH, EAST -> obstacle.getTopLeft();
@@ -231,18 +233,18 @@ public class DetectedObjectDetails {
    *                             blocking mountains
    * @return Map of directions to lists of detected robot details
    */
-  private Map<Direction, List<ObjectDetail>> detectRobots(List<Robot> robots, Position currentPos,
-      Map<Direction, List<ObjectDetail>> obstaclesByDirection) {
-    Map<Direction, List<ObjectDetail>> robotsByDirection = new EnumMap<>(Direction.class);
+  private Map<Direction, List<ObjectDetail>> detectRobots(final List<Robot> robots, final Position currentPos,
+      final Map<Direction, List<ObjectDetail>> obstaclesByDirection) {
+    final Map<Direction, List<ObjectDetail>> robotsByDirection = new EnumMap<>(Direction.class);
 
     robots.stream()
         .filter(robot -> !currentPos.equals(robot.getPosition()))
         .forEach(robot -> {
-          Position robotPos = robot.getPosition();
-          Direction direction = getDirectionToRobot(currentPos, robotPos);
+          final Position robotPos = robot.getPosition();
+          final Direction direction = getDirectionToRobot(currentPos, robotPos);
 
           if (direction != null) {
-            int distance = currentPos.distanceFrom(robotPos, direction);
+            final int distance = currentPos.distanceFrom(robotPos, direction);
             if (distance <= VISIBILITY && isBehindMountain(direction, distance, obstaclesByDirection)) {
               robotsByDirection.computeIfAbsent(direction, k -> new ArrayList<>())
                   .add(new ObjectDetail("ROBOT", distance, direction));
@@ -256,7 +258,7 @@ public class DetectedObjectDetails {
    * Determines the cardinal direction from currentPos to robotPos, or null if not
    * cardinal.
    */
-  private Direction getDirectionToRobot(Position currentPos, Position robotPos) {
+  private Direction getDirectionToRobot(final Position currentPos, final Position robotPos) {
     if (currentPos.getX() == robotPos.getX()) {
       return robotPos.getY() > currentPos.getY() ? SOUTH : NORTH;
     } else if (currentPos.getY() == robotPos.getY()) {
@@ -268,8 +270,8 @@ public class DetectedObjectDetails {
   /**
    * Checks if a direction is blocked by a mountain.
    */
-  private boolean isDirectionBlockedByMountain(Direction direction,
-      Map<Direction, List<ObjectDetail>> obstaclesByDirection) {
+  private boolean isDirectionBlockedByMountain(final Direction direction,
+      final Map<Direction, List<ObjectDetail>> obstaclesByDirection) {
     return obstaclesByDirection.getOrDefault(direction, Collections.emptyList()).stream()
         .anyMatch(obj -> obj.getType().equals("MOUNTAIN"));
   }
@@ -277,8 +279,8 @@ public class DetectedObjectDetails {
   /**
    * Checks if an object at a specific distance is behind a mountain.
    */
-  private boolean isBehindMountain(Direction direction, int objectDistance,
-      Map<Direction, List<ObjectDetail>> obstaclesByDirection) {
+  private boolean isBehindMountain(final Direction direction, final int objectDistance,
+      final Map<Direction, List<ObjectDetail>> obstaclesByDirection) {
     return obstaclesByDirection.getOrDefault(direction, Collections.emptyList()).stream()
         .filter(obj -> obj.getType().equals("MOUNTAIN"))
         .noneMatch(mountain -> mountain.getDistance() < objectDistance);

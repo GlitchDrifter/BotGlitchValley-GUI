@@ -22,16 +22,6 @@ public class LaunchCommand extends Command {
   private static LaunchCommand instance;
 
   /**
-   * Private constructor to create a Launch command with a name and arguments.
-   *
-   * @param argument  the robot name
-   * @param arguments the JsonArray containing robot type
-   */
-  private LaunchCommand(String argument, JsonArray arguments) {
-    super("launch", argument, arguments);
-  }
-
-  /**
    * Gets the singleton instance with the given robot name and arguments.
    *
    * @param robotName the name of the robot to launch
@@ -39,7 +29,7 @@ public class LaunchCommand extends Command {
    * @return The singleton instance of LaunchCommand configured with the specified
    *         arguments
    */
-  public static synchronized LaunchCommand getInstance(String robotName, JsonArray arguments) {
+  public static synchronized LaunchCommand getInstance(final String robotName, final JsonArray arguments) {
     if (instance == null) {
       instance = new LaunchCommand(robotName, arguments);
     } else {
@@ -55,19 +45,29 @@ public class LaunchCommand extends Command {
    * @param robotName the new robot name
    * @param arguments the new JsonArray of arguments
    */
-  private static void setArguments(LaunchCommand instance, String robotName, JsonArray arguments) {
+  private static void setArguments(final LaunchCommand instance, final String robotName, final JsonArray arguments) {
     try {
-      java.lang.reflect.Field argumentField = Command.class.getDeclaredField("argument");
-      java.lang.reflect.Field argumentsField = Command.class.getDeclaredField("arguments");
+      final java.lang.reflect.Field argumentField = Command.class.getDeclaredField("argument");
+      final java.lang.reflect.Field argumentsField = Command.class.getDeclaredField("arguments");
 
       argumentField.setAccessible(true);
       argumentsField.setAccessible(true);
 
       argumentField.set(instance, robotName);
       argumentsField.set(instance, arguments);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new RuntimeException(e);
     }
+  }
+
+  /**
+   * Private constructor to create a Launch command with a name and arguments.
+   *
+   * @param argument  the robot name
+   * @param arguments the JsonArray containing robot type
+   */
+  private LaunchCommand(final String argument, final JsonArray arguments) {
+    super("launch", argument, arguments);
   }
 
   /**
@@ -75,16 +75,16 @@ public class LaunchCommand extends Command {
    * The name is set to "launch".
    */
   @Override
-  public JsonObject execute(World world) {
-    JsonObject response = new JsonObject();
-    JsonObject data = new JsonObject();
-    String robotType = getArguments().get(0).getAsString();
+  public JsonObject execute(final World world) {
+    final JsonObject response = new JsonObject();
+    final JsonObject data = new JsonObject();
+    final String robotType = getArguments().get(0).getAsString();
     if (world.getBots().stream().noneMatch(r -> r.getName().equals(getArgument()))) {
-      Robot newRobot = new Robot(getArgument(), robotType);
+      final Robot newRobot = new Robot(getArgument(), robotType);
       world.setCurrentRobot(newRobot);
       world.addRobot(newRobot);
       Position randPos;
-      Random rand = new Random();
+      final Random rand = new Random();
       while (true) {
         randPos = new Position(rand.nextInt(HEIGHT), rand.nextInt(WIDTH));
         if (world.isLaunchAllowed(randPos)) {

@@ -14,14 +14,6 @@ public class RepairCommand extends Command {
   private static RepairCommand instance;
 
   /**
-   * Private constructor for RepairCommand.
-   * Sets the command name to "repair".
-   */
-  private RepairCommand() {
-    super("repair");
-  }
-
-  /**
    * Gets the singleton instance of RepairCommand.
    * 
    * @return The singleton instance of RepairCommand
@@ -34,6 +26,14 @@ public class RepairCommand extends Command {
   }
 
   /**
+   * Private constructor for RepairCommand.
+   * Sets the command name to "repair".
+   */
+  private RepairCommand() {
+    super("repair");
+  }
+
+  /**
    * Executes the repair command in the given world.
    * It repairs the robot's shields and returns the result.
    *
@@ -41,9 +41,9 @@ public class RepairCommand extends Command {
    * @return a JsonObject containing the result of the repair command
    */
   @Override
-  public JsonObject execute(World world) {
-    JsonObject response = new JsonObject();
-    JsonObject data = new JsonObject();
+  public JsonObject execute(final World world) {
+    final JsonObject response = new JsonObject();
+    final JsonObject data = new JsonObject();
     String result, message;
 
     if (world.getCurrentRobot().repair()) {
